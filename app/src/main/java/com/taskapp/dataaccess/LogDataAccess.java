@@ -65,10 +65,10 @@ public class LogDataAccess {
                 int taskCode = Integer.parseInt(values[0]);
                 int changeUserCode = Integer.parseInt(values[1]);
                 int status = Integer.parseInt(values[2]);
-                LocalDate changeDate = values[3];
+                LocalDate changeDate = LocalDate.parse(values[3]);
 
                 Log log = new Log(taskCode, changeUserCode, status, changeDate);
-                logs.add(Log);
+                logs.add(log);
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -87,7 +87,7 @@ public class LogDataAccess {
          * 1．findAllからListを受け取る
          * 2．Listの情報でcsvに上書き。taskCodeと一致するものは記載しない
          */
-        List<Log> logs = new ArrayList<>();
+        List<Log> logs = findAll();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             String line;
             writer.write("Task_Code,Change_User_Code,Status,Change_Date");

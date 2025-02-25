@@ -131,7 +131,7 @@ public class TaskDataAccess {
          */
         List<Task> tasks = new ArrayList<>();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            writer.write(Code,Name,Status,Rep_User_Code);
+            writer.write("Code,Name,Status,Rep_User_Code");
             writer.newLine();
             
             String line;
@@ -159,7 +159,7 @@ public class TaskDataAccess {
          * 1．findAllからListを受け取る
          * 2．Listの情報からcsvに上書き。codeと一致する情報は記載しない
          */
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks = findAll();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             String line;
             writer.write("Code,Name,Status,Rep_User_Code");
