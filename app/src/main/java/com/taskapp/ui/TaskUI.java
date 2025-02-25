@@ -4,9 +4,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import javax.print.DocFlavor.READER;
+
 import com.taskapp.logic.TaskLogic;
 import com.taskapp.logic.UserLogic;
 import com.taskapp.model.User;
+import com.taskapp.App;
+import com.taskapp.exception.AppException;
 
 public class TaskUI {
     private final BufferedReader reader;
@@ -46,6 +50,7 @@ public class TaskUI {
     public void displayMenu() {
         System.out.println("タスク管理アプリケーションにようこそ!!");
 
+        inputLogin();
         // メインメニュー
         boolean flg = true;
         while (flg) {
@@ -59,8 +64,10 @@ public class TaskUI {
 
                 switch (selectMenu) {
                     case "1":
+                        taskLogic.showAll(loginUser);
                         break;
                     case "2":
+                        inputNewInformation();
                         break;
                     case "3":
                         System.out.println("ログアウトしました。");
@@ -82,8 +89,33 @@ public class TaskUI {
      *
      * @see com.taskapp.logic.UserLogic#login(String, String)
      */
-    // public void inputLogin() {
-    // }
+    public void inputLogin() {
+        /*
+         * 1．無限ループでメールアドレス・パスワードの入力を求める
+         * 2．入力されたメールアドレス、パスワードを引数にUserLogicクラスのloginを呼び出しloginUserに代入
+         * 3．例外がスローされた場合は例外メッセージを出力し再度入力を求める
+         * 4．正常に処理された場合はループを抜け終了
+         */
+        
+        boolean flg = true;
+        while (flg) {
+            try {
+                System.out.print("メールアドレスを入力してください：");
+                String email = reader.readLine();
+                System.out.print("パスワードを入力してください：");
+                            String password = reader.readLine();
+    
+                loginUser = userLogic.login(email, password);
+                flg = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (AppException e) {
+                System.out.println(e.getMessage());
+            }
+            System.out.println();
+        }
+    }
+
 
     /**
      * ユーザーからの新規タスク情報を受け取り、新規タスクを登録します。
@@ -91,8 +123,50 @@ public class TaskUI {
      * @see #isNumeric(String)
      * @see com.taskapp.logic.TaskLogic#save(int, String, int, User)
      */
-    // public void inputNewInformation() {
-    // }
+    public void inputNewInformation() {
+        /*
+         * 1．タスクコード、タスク名、タスクを担当するユーザーコードの入力を求める
+         * 2．各項目に対してバリデーションを行う
+         * 3．ユーザーコードが存在しない場合は例外メッセージを出力
+         */
+
+        boolean flg = true;
+        while (flg) {
+            try {
+                System.out.print("タスクコードを入力してください：");
+                String taskCode = reader.readLine();
+                if (!isNumeric(taskCode)) {
+                System.out.println("半角の整数で入力してください。");
+                System.out.println();
+                continue;
+                }
+
+                System.out.print("タスク名を入力してください：");
+                String taskName = reader.readLine();
+                if (!(taskName.length() <= 10)) {
+                    System.out.println("商品名は10文字以内で入力してください");
+                    System.out.println();
+                    continue;
+                }
+
+                System.out.print("担当するユーザーのコードを選択してください：");
+                String userCode = reader.readLine();
+                if (!isNumeric(userCode)) {
+                System.out.println("半角の整数で入力してください。");
+                System.out.println();
+                continue;
+                }
+
+                taskLogic.save(Integer.parseInt(taskCode), taskName, Integer.parseInt(userCode), loginUser);
+                System.out.println(taskName + "の登録が完了しました");
+                flg = false;
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (AppException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
 
     /**
      * タスクのステータス変更または削除を選択するサブメニューを表示します。
@@ -128,7 +202,7 @@ public class TaskUI {
      * @param inputText 判定する文字列
      * @return 数値であればtrue、そうでなければfalse
      */
-    // public boolean isNumeric(String inputText) {
-    //     return false;
-    // }
+    public boolean isNumeric(String inputText) {
+        return inputText.chars().allMatch(c -> Character.isDigit((char) c));
+    }
 }
