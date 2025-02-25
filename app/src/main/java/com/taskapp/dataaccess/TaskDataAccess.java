@@ -129,7 +129,7 @@ public class TaskDataAccess {
          * 2．Listをもとにcsvに書き込みを行う
          * 3．書きこむTaskCodeとupdateTaskCodeが一致した場合はupdateTaskの情報を書き込む
          */
-        List<Task> tasks = new ArrayList<>();
+        List<Task> tasks = findAll();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             writer.write("Code,Name,Status,Rep_User_Code");
             writer.newLine();
