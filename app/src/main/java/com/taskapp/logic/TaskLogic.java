@@ -104,9 +104,23 @@ public class TaskLogic {
      * @param loginUser ログインユーザー
      * @throws AppException タスクコードが存在しない、またはステータスが前のステータスより1つ先でない場合にスローされます
      */
-    // public void changeStatus(int code, int status,
-    //                         User loginUser) throws AppException {
-    // }
+    public void changeStatus(int code, int status,
+                            User loginUser) throws AppException {
+        /*
+         * 1．TaskDataAccessクラスのfindByCodeから指定のタスクを取得
+         * 2．存在しない場合は例外をスロー
+         * 3．引数のstatus-TaskStatusが1じゃない場合は例外をスロー
+         * 4．取得したTaskのStatusを変更
+         * 5．
+         */
+
+        Task task = taskDataAccess.findByCode(code);
+        if (task == null) throw new AppException("存在するタスクコードを入力してください");
+        if ((status - task.getStatus()) != 1) throw new AppException("ステータスは、前のステータスより1つ先のもののみを選択してください");
+
+        task.setStatus(status);
+
+    }
 
     /**
      * タスクを削除します。
@@ -117,6 +131,19 @@ public class TaskLogic {
      * @param code タスクコード
      * @throws AppException タスクコードが存在しない、またはタスクのステータスが完了でない場合にスローされます
      */
-    // public void delete(int code) throws AppException {
-    // }
+    public void delete(int code) throws AppException {
+        /*
+         * 1．引数のcodeでTaskDataAccessクラスのfindByCodeを呼び出し
+         * 2．nullが帰ってきた場合は例外をスロー
+         * 3．ステータスが完了じゃない場合は例外をスロー
+         * 3．上記以外の場合はTaskDataAccessクラスのdelete、LogDataAccessクラスのdeleteByTaskCodeを呼び出し
+         */
+
+        Task task = taskDataAccess.findByCode(code);
+        if (task == null) throw new AppException("存在するタスクコードを入力してください");
+        if (task.getStatus() != 2) throw new AppException("ステータスが完了のタスクを選択してください");
+
+        taskDataAccess.delete(code);
+        logDataAccess.deleteByTaskCode(code);
+    }
 }

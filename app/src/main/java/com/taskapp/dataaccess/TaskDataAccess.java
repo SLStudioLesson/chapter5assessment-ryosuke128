@@ -2,6 +2,7 @@ package com.taskapp.dataaccess;
 
 import java.util.*;
 
+import com.taskapp.model.Log;
 import com.taskapp.model.Task;
 import com.taskapp.model.User;
 import com.taskapp.model.Task;
@@ -76,8 +77,8 @@ public class TaskDataAccess {
          */
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, true))) {
             String line = createLine(task);
-            writer.write(line);
             writer.newLine();
+            writer.write(line);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -92,7 +93,7 @@ public class TaskDataAccess {
         /*
          * 1．csvを1行ずつ読み込み「,」で分割する
          * 2．引数で受け取ったcodeと一致する行を探す
-         * 3．一致するものがない場合はnuulを返却
+         * 3．一致するものがない場合はnullを返却
          * 4．一致したらUserインスタンスを返却
          */
         Task task = null;
@@ -153,13 +154,28 @@ public class TaskDataAccess {
      * コードを基にタスクデータを削除します。
      * @param code 削除するタスクのコード
      */
-    // public void delete(int code) {
-    //     try () {
+    public void delete(int code) {
+        /*
+         * 1．findAllからListを受け取る
+         * 2．Listの情報からcsvに上書き。codeと一致する情報は記載しない
+         */
+        List<Task> tasks = new ArrayList<>();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            String line;
+            writer.write("Code,Name,Status,Rep_User_Code");
+            writer.newLine();
 
-    //     } catch (IOException e) {
-    //         e.printStackTrace();
-    //     }
-    // }
+            for (Task task : tasks) {
+                if (task.getCode() == code) continue;
+                line = createLine(task);
+                writer.write(line);
+                writer.newLine();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * タスクデータをCSVに書き込むためのフォーマットを作成します。
